@@ -9,7 +9,6 @@ const PERFIL_LABELS: Record<string, string> = {
   tipico: "Ele é típico, mas muito seletivo.",
   atipico: "Ele é atípico.",
   sem_dx: "Ainda não tenho diagnóstico.",
-  mae_atipica: "Eu sou mãe atípica.",
 };
 
 const SENTIMENTO_LABELS: Record<string, string> = {

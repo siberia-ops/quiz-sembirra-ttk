@@ -4,7 +4,7 @@ export const ALIMENTOS = [
   { key: "vegetais", emoji: "🥦", label: "Vegetais e folhas" },
   { key: "frutas", emoji: "🍎", label: "Frutas" },
   { key: "carnes", emoji: "🍗", label: "Carnes e proteínas" },
-  { key: "misturada", emoji: "🥄", label: "Comida misturada", subtitle: "Ele só come separado" },
+  { key: "misturada", emoji: "🥄", label: "Comida misturada", subtitle: "Só come separado" },
   {
     key: "massa",
     emoji: "🍝",
@@ -32,7 +32,7 @@ export const DIAGNOSTICO_LINHAS: Record<string, { emoji: string; title: string; 
   misturada: {
     emoji: "🥄",
     title: "Comida misturada",
-    text: "Quando come tudo separado, ele perde a variedade nutricional combinada de cada refeição.",
+    text: "Quando come tudo separado, a criança perde a variedade nutricional combinada de cada refeição.",
   },
   massa: {
     emoji: "🍝",
@@ -47,13 +47,13 @@ export const DIAGNOSTICO_LINHAS: Record<string, { emoji: string; title: string; 
 };
 
 export const TENTATIVAS = [
-  { key: "liquido", emoji: "💧", label: "Suplemento líquido", subtitle: "Ele recusa o sabor" },
-  { key: "comprimido", emoji: "💊", label: "Comprimido", subtitle: "Não consigo fazer ele engolir" },
+  { key: "liquido", emoji: "💧", label: "Suplemento líquido", subtitle: "Recusou o sabor" },
+  { key: "comprimido", emoji: "💊", label: "Comprimido", subtitle: "Não consegue engolir" },
   {
     key: "outra",
     emoji: "🍬",
     label: "Goma/balinha de outra marca",
-    subtitle: "Ele não aceitou",
+    subtitle: "Não foi aceita",
   },
   { key: "nada", emoji: "🤷", label: "Nada ainda", subtitle: "Não sei por onde começar" },
 ] as const;

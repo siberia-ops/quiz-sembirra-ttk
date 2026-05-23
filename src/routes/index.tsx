@@ -3,6 +3,7 @@ import { AnimatePresence } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
 import { useQuiz, sanitize, track } from "@/lib/quiz-state";
 import { sendQuizToWebhook } from "@/lib/quiz-webhook";
+import { gendered } from "@/lib/gender";
 import { Header, Screen, Headline, SubText, PrimaryButton, OptionCard } from "@/components/quiz/Shell";
 import { LoadingScreen } from "@/components/quiz/LoadingScreen";
 import {
@@ -79,6 +80,7 @@ function QuizPage() {
     state.step > blockStart && state.step !== 6 && state.step !== 11;
   const progress = STEP_PROGRESS[state.step] ?? 0;
   const isLoading = state.step === 6 || state.step === 11;
+  const g = gendered(state.nome_filho);
 
   const onBack = () => {
     let prev = state.step - 1;
@@ -120,7 +122,7 @@ function QuizPage() {
           <LoadingScreen
             key="tb"
             duration={4000}
-            topLines={[`Quase pronto, ${state.nome_mae}.`, `Preparando o resultado pro ${state.nome_filho}…`]}
+            topLines={[`Quase pronto, ${state.nome_mae}.`, `Preparando o resultado ${g.pro} ${state.nome_filho}…`]}
             carousel={[
               {
                 quote:
@@ -241,10 +243,11 @@ function Step2Idade({ state, update, go }: StepProps) {
     go(2);
   });
   const opts = ["3 a 4 anos", "5 a 6 anos", "7 a 9 anos", "10 anos ou mais"];
+  const g = gendered(state.nome_filho);
   return (
     <Screen>
       <Headline>
-        {state.nome_mae}, quantos anos tem o {state.nome_filho}?
+        {state.nome_mae}, quantos anos tem {g.o} {state.nome_filho}?
       </Headline>
       <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-3">
         {opts.map((o) => (
@@ -257,6 +260,7 @@ function Step2Idade({ state, update, go }: StepProps) {
 
 function Step3Perfil({ state, update, go }: StepProps) {
   const [sel, setSel] = useState<string | null>(state.perfil_filho || null);
+  const g = gendered(state.nome_filho);
   useAutoAdvance(sel, () => {
     if (!sel) return;
     update({ perfil_filho: sel });
@@ -264,15 +268,14 @@ function Step3Perfil({ state, update, go }: StepProps) {
     go(3);
   });
   const opts = [
-    { key: "tipico", title: "Ele é típico, mas muito seletivo.", subtitle: "Não tem diagnóstico, mas é exigente com comida." },
-    { key: "atipico", title: "Ele é atípico.", subtitle: "TEA, TDAH ou neurodivergente." },
-    { key: "sem_dx", title: "Ainda não tenho diagnóstico.", subtitle: "Mas ele dá muito trabalho na hora da refeição." },
-    { key: "mae_atipica", title: "Eu sou mãe atípica.", subtitle: "Ele tem questão sensorial com alimento." },
+    { key: "tipico", title: `${g.Ele} é ${g.adj("típico")}, mas muito ${g.adj("seletivo")}.`, subtitle: `Não tem diagnóstico, mas é ${g.adj("exigente")} com comida.` },
+    { key: "atipico", title: `${g.Ele} é ${g.adj("atípico")}.`, subtitle: "TEA, TDAH ou neurodivergente." },
+    { key: "sem_dx", title: "Ainda não tenho diagnóstico.", subtitle: `Mas ${g.ele} dá muito trabalho na hora da refeição.` },
   ];
   return (
     <Screen>
       <Headline>
-        {state.nome_mae}, como você descreveria o {state.nome_filho}?
+        {state.nome_mae}, como você descreveria {g.o} {state.nome_filho}?
       </Headline>
       <div className="mt-8 space-y-3">
         {opts.map((o) => (
@@ -299,9 +302,10 @@ function Step4Alimentos({ state, update, go }: StepProps) {
     track("quiz_step_4_alimentos", { alimentos_recusados: sel });
     go(4);
   };
+  const g = gendered(state.nome_filho);
   return (
     <Screen>
-      <Headline>Quais alimentos o {state.nome_filho} recusa?</Headline>
+      <Headline>Quais alimentos {g.o} {state.nome_filho} recusa?</Headline>
       <SubText>Pode marcar mais de uma.</SubText>
       <div className="mt-6 space-y-3">
         {ALIMENTOS.map((a) => (
@@ -328,13 +332,14 @@ function Step5Diagnostico({ state, go }: { state: StepProps["state"]; go: StepPr
   const linhas = state.alimentos_recusados
     .map((k) => DIAGNOSTICO_LINHAS[k])
     .filter(Boolean);
+  const g = gendered(state.nome_filho);
   return (
     <Screen>
       <Headline>
-        {state.nome_mae}, tem uma coisa importante sobre o {state.nome_filho}.
+        {state.nome_mae}, tem uma coisa importante sobre {g.o} {state.nome_filho}.
       </Headline>
       <p className="mt-4 text-[16px] md:text-[17px] leading-relaxed text-[var(--brand-ink)]">
-        Pelo que você marcou, o {state.nome_filho} pode estar com algumas vitaminas e minerais
+        Pelo que você marcou, {g.o} {state.nome_filho} pode estar com algumas vitaminas e minerais
         abaixo do ideal. Mais de{" "}
         <strong className="text-[var(--brand-green)]">7 em cada 10 crianças com seletividade alimentar</strong>{" "}
         passam por isso — e tem solução.
@@ -374,6 +379,7 @@ function Step5Diagnostico({ state, go }: { state: StepProps["state"]; go: StepPr
 
 function Step6Sentimento({ state, update, go }: StepProps) {
   const [sel, setSel] = useState<string | null>(state.sentimento_mae || null);
+  const g = gendered(state.nome_filho);
   useAutoAdvance(sel, () => {
     if (!sel) return;
     update({ sentimento_mae: sel });
@@ -382,15 +388,15 @@ function Step6Sentimento({ state, update, go }: StepProps) {
   });
   const opts = [
     { key: "esgotada", title: "Esgotada.", subtitle: "Toda refeição vira briga." },
-    { key: "preocupada", title: "Preocupada.", subtitle: "Tenho medo dele estar com carência de alguma coisa." },
-    { key: "desisti", title: "Já desisti de oferecer salada.", subtitle: "Dou o que ele aceita pra ele não ficar com fome." },
-    { key: "culpa", title: "Sinto culpa.", subtitle: "Sei que tô deixando de dar coisa que ele precisa." },
+    { key: "preocupada", title: "Preocupada.", subtitle: `Tenho medo d${g.ele} estar com carência de alguma coisa.` },
+    { key: "desisti", title: "Já desisti de oferecer salada.", subtitle: `Dou o que ${g.ele} aceita pra ${g.ele} não ficar com fome.` },
+    { key: "culpa", title: "Sinto culpa.", subtitle: `Sei que tô deixando de dar coisa que ${g.ele} precisa.` },
     { key: "esperanca", title: "Ainda tenho esperança.", subtitle: "Mas tô no meu limite." },
   ];
   return (
     <Screen>
       <Headline>
-        E você, {state.nome_mae} — como tá se sentindo na hora das refeições do {state.nome_filho}?
+        E você, {state.nome_mae} — como tá se sentindo na hora das refeições {g.do} {state.nome_filho}?
       </Headline>
       <div className="mt-8 space-y-3">
         {opts.map((o) => (
@@ -419,10 +425,11 @@ function Step7Pediatra({ state, update, go }: StepProps) {
     { key: "sim", title: "Sim.", subtitle: "Já levei pra avaliar." },
     { key: "nao", title: "Ainda não.", subtitle: "Mas é uma das coisas que mais me preocupam." },
   ];
+  const g = gendered(state.nome_filho);
   return (
     <Screen>
       <Headline>
-        Você já levou o {state.nome_filho} no pediatra ou nutricionista pra avaliar isso?
+        Você já levou {g.o} {state.nome_filho} no pediatra ou nutricionista pra avaliar isso?
       </Headline>
       <div className="mt-8 space-y-3">
         {opts.map((o) => (
@@ -447,15 +454,16 @@ function Step7bPediatraDisse({ state, update, go }: StepProps) {
     track("quiz_step_7b_pediatra_disse", { pediatra_disse: sel });
     go(9);
   });
+  const g = gendered(state.nome_filho);
   const opts = [
-    { key: "recomendou", title: "Recomendou suplementação.", subtitle: "Mas ele não aceita os suplementos do mercado." },
+    { key: "recomendou", title: "Recomendou suplementação.", subtitle: `Mas ${g.ele} não aceita os suplementos do mercado.` },
     { key: "exame", title: "O exame mostrou vitamina baixa.", subtitle: "Pelo menos uma das vitaminas tá fora do ideal." },
     { key: "tudo_bem", title: "Falou que tá tudo bem.", subtitle: "Mas eu mesma desconfio que tem alguma carência." },
   ];
   return (
     <Screen>
       <Headline>
-        E o que o pediatra ou nutricionista disse sobre o {state.nome_filho}?
+        E o que o pediatra ou nutricionista disse sobre {g.o} {state.nome_filho}?
       </Headline>
       <div className="mt-8 space-y-3">
         {opts.map((o) => (
@@ -482,9 +490,10 @@ function Step8Tentativas({ state, update, go }: StepProps) {
     track("quiz_step_8_tentativas", { tentativas_anteriores: sel });
     go(10);
   };
+  const g = gendered(state.nome_filho);
   return (
     <Screen>
-      <Headline>Já tentou alguma dessas opções com o {state.nome_filho}?</Headline>
+      <Headline>Já tentou alguma dessas opções com {g.o} {state.nome_filho}?</Headline>
       <SubText>Pode marcar mais de uma.</SubText>
       <div className="mt-6 space-y-3">
         {TENTATIVAS.map((t) => (
@@ -515,15 +524,16 @@ function Step9Urgencia({ state, update, go }: StepProps) {
     track("quiz_step_9_urgencia", { urgencia: sel });
     go(11);
   });
+  const g = gendered(state.nome_filho);
   const opts = [
     { key: "hoje", title: "Hoje.", subtitle: "Eu não aguento mais." },
     { key: "semanas", title: "Nas próximas semanas.", subtitle: "Dá pra esperar um pouco." },
-    { key: "tempo_dele", title: "No tempo dele.", subtitle: "Não tenho pressa, ele faz quando estiver pronto." },
+    { key: "tempo_dele", title: `No tempo d${g.ele}.`, subtitle: `Não tenho pressa, ${g.ele} faz quando estiver ${g.adj("pronto")}.` },
   ];
   return (
     <Screen>
       <Headline>
-        Quando você gostaria de ver o {state.nome_filho} aceitando comida saudável{" "}
+        Quando você gostaria de ver {g.o} {state.nome_filho} aceitando comida saudável{" "}
         <span className="font-bold text-[var(--brand-green)]">sem birra</span>?
       </Headline>
       <div className="mt-8 space-y-3">
@@ -542,6 +552,7 @@ function Step9Urgencia({ state, update, go }: StepProps) {
 }
 
 function FinalScreen({ state }: { state: StepProps["state"] }) {
+  const g = gendered(state.nome_filho);
   const diagnostico = useMemo(() => buildDiagnostico(state), [state]);
 
   useEffect(() => {
@@ -574,7 +585,7 @@ function FinalScreen({ state }: { state: StepProps["state"] }) {
   return (
     <Screen>
       <Headline>
-        {state.nome_mae}, tem uma coisa que você precisa saber sobre o {state.nome_filho}.
+        {state.nome_mae}, tem uma coisa que você precisa saber sobre {g.o} {state.nome_filho}.
       </Headline>
 
       <div className="mt-6 overflow-hidden rounded-[24px] border-[1.5px] border-[var(--brand-border)] bg-[var(--card)]">
@@ -589,7 +600,7 @@ function FinalScreen({ state }: { state: StepProps["state"] }) {
         <p className="text-[16px] leading-relaxed text-[var(--brand-ink)]">{diagnostico}</p>
         <p className="mt-4 text-[16px] leading-relaxed text-[var(--brand-ink)]">
           A boa notícia: a balinha do Sem Birra foi feita exatamente pra esse perfil —{" "}
-          <strong>crianças de {state.faixa_idade} como o {state.nome_filho}</strong>. Ela não
+          <strong>crianças de {state.faixa_idade} como {g.o} {state.nome_filho}</strong>. Ela não
           precisa ser engolida, não tem sabor de remédio, e mais de <strong>3 mil mães</strong> já
           confirmaram que os filhos aceitam.
         </p>
@@ -621,8 +632,8 @@ function FinalScreen({ state }: { state: StepProps["state"] }) {
           emoji="🍓"
           text={
             <>
-              Você dá <strong>1 balinha por dia</strong> pro {state.nome_filho}. Sabor morango,
-              textura de goma, ele com certeza vai amar!
+              Você dá <strong>1 balinha por dia</strong> {g.pro} {state.nome_filho}. Sabor morango,
+              textura de goma, {g.ele} com certeza vai amar!
             </>
           }
         />
@@ -632,7 +643,7 @@ function FinalScreen({ state }: { state: StepProps["state"] }) {
 
           text={
             <>
-              Em <strong>30 dias</strong> ele tá com 8 vitaminas e minerais que faltavam. Sem
+              Em <strong>30 dias</strong> {g.ele} tá com 8 vitaminas e minerais que faltavam. Sem
               briga, sem chorar, sem disfarçar na comida.
             </>
           }
@@ -641,14 +652,14 @@ function FinalScreen({ state }: { state: StepProps["state"] }) {
           emoji="💚"
           text={
             <>
-              Se ele <strong>não aceitar</strong>, devolve sem perguntar nada. Garantia de 30 dias.
+              Se {g.ele} <strong>não aceitar</strong>, devolve sem perguntar nada. Garantia de 30 dias.
             </>
           }
         />
       </div>
 
       <div className="mt-10">
-        <PrimaryButton onClick={onCta}>Quero a balinha pro {state.nome_filho}</PrimaryButton>
+        <PrimaryButton onClick={onCta}>Quero a balinha {g.pro} {state.nome_filho}</PrimaryButton>
         <p className="mt-3 text-center text-[13px] text-[var(--brand-mute)]">
           ✓ Mais de 12 mil mães já compraram · ✓ Frete grátis · ✓ Garantia 30 dias
         </p>
@@ -674,6 +685,7 @@ function buildDiagnostico(state: StepProps["state"]): string {
   const parts: string[] = [];
   const alim = state.alimentos_recusados;
   const filho = state.nome_filho;
+  const g = gendered(filho);
 
   // Frase 1 — rejeição alimentar
   if (alim.includes("vegetais") && alim.includes("frutas")) {
@@ -712,7 +724,7 @@ function buildDiagnostico(state: StepProps["state"]): string {
   }
 
   if (parts.length === 0) {
-    return `Pelo que você nos contou, o ${filho} tem um perfil bem comum aqui entre as mães que fizeram esse teste.`;
+    return `Pelo que você nos contou, ${g.o} ${filho} tem um perfil bem comum aqui entre as mães que fizeram esse teste.`;
   }
 
   // Build natural sentence
@@ -721,5 +733,5 @@ function buildDiagnostico(state: StepProps["state"]): string {
       ? parts[0]
       : parts.slice(0, -1).join(", ") + ", " + parts[parts.length - 1];
 
-  return `Pelo que você nos contou, o ${filho} tem um perfil bem comum aqui: ${joined}.`;
+  return `Pelo que você nos contou, ${g.o} ${filho} tem um perfil bem comum aqui: ${joined}.`;
 }
