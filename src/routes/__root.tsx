@@ -108,6 +108,16 @@ document.head.appendChild(a);
         `.trim(),
       },
       {
+        children: `
+window.tikTokPixelId = "6a07859b430149af9447c5e5";
+var a = document.createElement("script");
+a.setAttribute("async", "");
+a.setAttribute("defer", "");
+a.setAttribute("src", "https://cdn.utmify.com.br/scripts/pixel/pixel-tiktok.js");
+document.head.appendChild(a);
+        `.trim(),
+      },
+      {
         src: "https://cdn.utmify.com.br/scripts/utms/latest.js",
         async: true,
         defer: true,
