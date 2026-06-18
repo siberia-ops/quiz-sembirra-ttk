@@ -562,20 +562,9 @@ function FinalScreen({ state }: { state: StepProps["state"] }) {
 
 
   const ctaUrl = useMemo(() => {
-    const params = new URLSearchParams({
-      nome_filho: state.nome_filho,
-      nome_mae: state.nome_mae,
-      faixa_idade: state.faixa_idade,
-      perfil: state.perfil_filho,
-      alimentos_recusados: state.alimentos_recusados.join(","),
-      sentimento: state.sentimento_mae,
-      passou_pediatra: state.passou_pediatra,
-      pediatra_disse: state.pediatra_disse,
-      tentativas: state.tentativas_anteriores.join(","),
-      urgencia: state.urgencia,
-    });
-    return `${LANDING_URL_PLACEHOLDER}?${params.toString()}`;
-  }, [state]);
+    const search = typeof window !== "undefined" ? window.location.search : "";
+    return search ? `${LANDING_URL_PLACEHOLDER}${search}` : LANDING_URL_PLACEHOLDER;
+  }, []);
 
   const onCta = () => {
     track("cta_click", { url: ctaUrl });
