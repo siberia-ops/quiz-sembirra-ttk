@@ -58,7 +58,7 @@ export const TENTATIVAS = [
   { key: "nada", emoji: "🤷", label: "Nada ainda", subtitle: "Não sei por onde começar" },
 ] as const;
 
-export const LANDING_URL_PLACEHOLDER = "https://shop.sembirra.com/";
+export const LANDING_URL_PLACEHOLDER = "https://shop.sembirra.com/ttk/";
 export const FB_PIXEL_ID = "[FB_PIXEL_ID]";
 export const IMAGEM_HERO = "/images/imagem-hero.webp";
 export const IMAGEM_PRODUTO = "/images/imagem-produto.webp";
